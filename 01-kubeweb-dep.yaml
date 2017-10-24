@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: deploy-test
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web-front-end
+        department: group1
+    spec:
+      containers:
+      - name: tiny-webserver-1
+        image: drlee001/kubeweb
+        env:
+        # App(/tiny-goweb) uses as an argument
+        - name: PORT_ARGS
+          value: "--port=7777"
+        ports:
+        - containerPort: 7777
+          name: web-port
+          protocol: TCP
