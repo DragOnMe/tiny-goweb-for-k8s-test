@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: deploy-kubeweb-app
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1       # One by one
+      maxUnavailable: 0 # Wait for a new pod before killing one pod
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: web-front-end
+        department: dev
+    spec:
+      containers:
+      - name: tiny-webserver-1
+        image: drlee001/kubeweb:v0.8
+        env:
+        # App(/tiny-goweb) uses as an argument
+        - name: PORT_ARGS
+          value: "--port=7777"
+        ports:
+        - containerPort: 7777
+          name: web-port
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubeweb-app-svc
+  labels:
+    app: web-front-end
+spec:
+  type: NodePort
+  ports:
+  - port: 7777
+    targetPort: 7777
+    protocol: TCP
+    name: web-port
+  selector:
+    app: web-front-end
+    department: dev
